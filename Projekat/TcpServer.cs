@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 
@@ -19,7 +18,6 @@ namespace Projekat
             tcpListener = new TcpListener(ipAddress, port);
             receivedRequests = new List<string>();
         }
-
         public void StartServer()
         {
             tcpListener.Start();
@@ -30,22 +28,18 @@ namespace Projekat
                 TcpClient client = tcpListener.AcceptTcpClient();
                 Console.WriteLine("Client connected...");
 
-                //not allowed
-                //threads
-                Task.Run(() => HandleClient(client));
+                Thread clientThread = new Thread(() => HandleClient(client));
+                clientThread.Start();
 
             }
         }
 
-        private async Task HandleClient(TcpClient client)
+        private void HandleClient(TcpClient client)
         {
-            // The 'using' block ensures that the 'client' object is disposed of properly
-            // when it's no longer needed.
+
             using (client)
             {
-                // Inside the 'using' block for 'client', a 'NetworkStream' object is created.
-                // The 'using' block ensures that the 'stream' object is disposed of properly
-                // when it's no longer needed.
+
                 using (NetworkStream stream = client.GetStream())
                 {
 
@@ -55,29 +49,67 @@ namespace Projekat
                     HttpResponseHandler responseHandler = new HttpResponseHandler();
                     ImageService imageService = new ImageService();
 
-                    try 
+                    try
                     {
-                        string request = await requestHandler.ReadRequestAsync(stream);
+                        string request = requestHandler.ReadRequest(stream);
                         receivedRequests.Add(request);
 
-                        if (requestHandler.IsFileRequest(request))
+                        if (requestHandler.IsValidImageRequest(request))
                         {
-                            await imageService.ServeImageAsync(request, stream);
+                            imageService.ServeImage(request, stream);
                         }
                         else
                         {
-                            string response = responseHandler.GenerateResponse(request);
-                            await responseHandler.SendResponseAsync(response, stream);
+                            responseHandler.SendResponse("Dobrodosli na server!", stream);
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-
+                        Console.WriteLine($"{ex.Message}");
                     }
-                } // The 'stream' object is disposed of automatically when it goes out of scope.
-            } // The 'client' object is disposed of automatically when it goes out of scope.
+                }
+            }
         }
 
+        //private async Task HandleClientAsync(TcpClient client)
+        //{
+        //    // The 'using' block ensures that the 'client' object is disposed of properly
+        //    // when it's no longer needed.
+        //    using (client)
+        //    {
+        //        // Inside the 'using' block for 'client', a 'NetworkStream' object is created.
+        //        // The 'using' block ensures that the 'stream' object is disposed of properly
+        //        // when it's no longer needed.
+        //        using (NetworkStream stream = client.GetStream())
+        //        {
 
+        //            Console.WriteLine(stream.ToString());
+
+        //            HttpRequestHandler requestHandler = new HttpRequestHandler();
+        //            HttpResponseHandler responseHandler = new HttpResponseHandler();
+        //            ImageService imageService = new ImageService();
+
+        //            try 
+        //            {
+        //                string request = await requestHandler.ReadRequestAsync(stream);
+        //                receivedRequests.Add(request);
+
+        //                if (requestHandler.IsValidImageRequest(request))
+        //                {
+        //                    await imageService.ServeImageAsync(request, stream);
+        //                }
+        //                else
+        //                {
+        //                    string response = responseHandler.GenerateResponse(request);
+        //                    await responseHandler.SendResponseAsync(response, stream);
+        //                }
+        //            }
+        //            catch(Exception ex)
+        //            {
+
+        //            }
+        //        } // The 'stream' object is disposed of automatically when it goes out of scope.
+        //    } // The 'client' object is disposed of automatically when it goes out of scope.
+        //}
     }
 }

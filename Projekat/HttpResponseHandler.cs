@@ -29,29 +29,5 @@ namespace Projekat
             stream.Write(responseHeader, 0, responseHeader.Length);
             stream.Write(imageData, 0, imageData.Length);
         }
-
-                //public async Task SendResponseAsync(string response, NetworkStream stream)
-        //{
-        //    byte[] responseData = Encoding.UTF8.GetBytes(response);
-        //    await stream.WriteAsync(responseData, 0, responseData.Length);
-        //}
-
-        //improve
-        //public async Task SendImageResponseAsync(byte[] imageData, NetworkStream stream)
-        //{
-        //    StringBuilder responseBuilder = new StringBuilder();
-        //    responseBuilder.AppendLine("HTTP/1.1 200 OK");
-        //    responseBuilder.AppendLine("Content-Type: image/jpeg"); // Change content type according to your image type
-        //    responseBuilder.AppendLine($"Content-Length: {imageData.Length}");
-        //    responseBuilder.AppendLine();
-        //    byte[] responseHeader = Encoding.UTF8.GetBytes(responseBuilder.ToString());
-
-        //    await stream.WriteAsync(responseHeader, 0, responseHeader.Length);
-        //    await stream.WriteAsync(imageData, 0, imageData.Length);
-        //}
-
-
-
-
     }
 }

@@ -71,45 +71,6 @@ namespace Projekat
             }
         }
 
-        //private async Task HandleClientAsync(TcpClient client)
-        //{
-        //    // The 'using' block ensures that the 'client' object is disposed of properly
-        //    // when it's no longer needed.
-        //    using (client)
-        //    {
-        //        // Inside the 'using' block for 'client', a 'NetworkStream' object is created.
-        //        // The 'using' block ensures that the 'stream' object is disposed of properly
-        //        // when it's no longer needed.
-        //        using (NetworkStream stream = client.GetStream())
-        //        {
-
-        //            Console.WriteLine(stream.ToString());
-
-        //            HttpRequestHandler requestHandler = new HttpRequestHandler();
-        //            HttpResponseHandler responseHandler = new HttpResponseHandler();
-        //            ImageService imageService = new ImageService();
-
-        //            try 
-        //            {
-        //                string request = await requestHandler.ReadRequestAsync(stream);
-        //                receivedRequests.Add(request);
-
-        //                if (requestHandler.IsValidImageRequest(request))
-        //                {
-        //                    await imageService.ServeImageAsync(request, stream);
-        //                }
-        //                else
-        //                {
-        //                    string response = responseHandler.GenerateResponse(request);
-        //                    await responseHandler.SendResponseAsync(response, stream);
-        //                }
-        //            }
-        //            catch(Exception ex)
-        //            {
-
-        //            }
-        //        } // The 'stream' object is disposed of automatically when it goes out of scope.
-        //    } // The 'client' object is disposed of automatically when it goes out of scope.
-        //}
+       
     }
 }

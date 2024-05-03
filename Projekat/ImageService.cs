@@ -1,14 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.Caching;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-
-
-
 
 namespace Projekat
 {
@@ -100,12 +99,10 @@ namespace Projekat
                         // Cache the grayscale image
                         cache.Set(filename, outputData, DateTimeOffset.Now.AddMinutes(10)); // Cache for 10 minutes
 
-                        // Send the grayscale image response
                         HttpResponseHandler responseHandler = new HttpResponseHandler();
                         responseHandler.SendImageResponse(outputData, stream);
                     }
 
-                    // Dispose resources
                     image.Dispose();
                     grayscaleImage.Dispose();
                 }
@@ -123,31 +120,52 @@ namespace Projekat
         {
             Bitmap grayscaleImage = new Bitmap(image.Width, image.Height);
 
-            using (Graphics g = Graphics.FromImage(grayscaleImage))
+            int numThreads = Environment.ProcessorCount;
+            int stripHeight = image.Height / numThreads;
+
+            Thread[] threads = new Thread[numThreads];
+
+            for (int i = 0; i < numThreads; i++)
             {
-                // Create the grayscale color matrix
-                ColorMatrix colorMatrix = new ColorMatrix(
-                    new float[][]
-                    {
-                        new float[] {0.299f, 0.299f, 0.299f, 0, 0},
-                        new float[] {0.587f, 0.587f, 0.587f, 0, 0},
-                        new float[] {0.114f, 0.114f, 0.114f, 0, 0},
-                        new float[] {0, 0, 0, 1, 0},
-                        new float[] {0, 0, 0, 0, 1}
-                    });
+                int startY = i * stripHeight;
+                int endY = (i == numThreads - 1) ? image.Height : (i + 1) * stripHeight;
 
-                // Create the ImageAttributes object and set the color matrix
-                using (ImageAttributes attributes = new ImageAttributes())
+                Image imageCopy = new Bitmap(image); // Create a copy of the original image for each thread
+
+                threads[i] = new Thread(() =>
                 {
-                    attributes.SetColorMatrix(colorMatrix);
+                    ConvertStripToGrayscale(imageCopy, grayscaleImage, startY, endY);
+                });
 
-                    // Draw the image with the grayscale color matrix
-                    g.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height),
-                        0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
-                }
+                threads[i].Start();
+            }
+
+            // Wait for all threads to complete
+            foreach (Thread thread in threads)
+            {
+                thread.Join();
             }
 
             return grayscaleImage;
         }
+
+        private void ConvertStripToGrayscale(Image image, Bitmap grayscaleImage, int startY, int endY)
+        {
+            for (int y = startY; y < endY; y++)
+            {
+                for (int x = 0; x < image.Width; x++)
+                {
+                    Color pixel = ((Bitmap)image).GetPixel(x, y);
+                    int grayscaleValue = (int)(pixel.R * 0.299 + pixel.G * 0.587 + pixel.B * 0.114);
+                    Color grayscaleColor = Color.FromArgb(grayscaleValue, grayscaleValue, grayscaleValue);
+
+                    lock (grayscaleImage)
+                    {
+                        grayscaleImage.SetPixel(x, y, grayscaleColor);
+                    }
+                }
+            }
+        }
+
     }
 }

@@ -43,8 +43,6 @@ namespace Projekat
                 using (NetworkStream stream = client.GetStream())
                 {
 
-                    Console.WriteLine(stream.ToString());
-
                     HttpRequestHandler requestHandler = new HttpRequestHandler();
                     HttpResponseHandler responseHandler = new HttpResponseHandler();
                     ImageService imageService = new ImageService();
@@ -58,10 +56,15 @@ namespace Projekat
                         {
                             imageService.ServeImage(request, stream);
                         }
-                        else
-                        {
-                            responseHandler.SendResponse("Dobrodosli na server!", stream);
-                        }
+                        
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        responseHandler.SendResponse("Dobrodosli na server!", stream);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        responseHandler.SendResponse(ex.Message, stream);
                     }
                     catch (Exception ex)
                     {

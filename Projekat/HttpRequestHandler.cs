@@ -25,30 +25,35 @@ namespace Projekat
         }
 
         public bool IsValidImageRequest(string request)
-    {
-        string[] parts = request.Split(' ');
-        string filename = parts[1].Substring(1); // Remove the leading slash
-        Console.WriteLine("Filename: " + filename);
-
-        if (!File.Exists(filename))
         {
-            Console.WriteLine("File does not exist.");
-            return false;
-        }
+            string[] parts = request.Split(' ');
+            string filename = parts[1].Substring(1); // Remove the leading slash
 
-        string extension = Path.GetExtension(filename).ToLower();
-        if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" ||
-            extension == ".gif" || extension == ".bmp")
-        {
-            Console.WriteLine("Valid image file.");
-            return true;
-        }
-        else
-        {
-            Console.WriteLine("Not an image file.");
-            return false;
-        }
-    }
+            if (filename == "")
+            {
+                throw new ArgumentNullException();
 
+            }
+
+            if (!File.Exists(filename))
+            {
+                throw new ArgumentException("File " + filename + " does not exist");
+            }
+
+            string extension = Path.GetExtension(filename).ToLower();
+            if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" ||
+                extension == ".gif" || extension == ".bmp")
+            {
+                Console.WriteLine("Valid image file.");
+                return true;
+            }
+            else
+            {
+                throw new ArgumentException("File " + filename + " is not a valid image file");
+
+
+            }
+
+        }
     }
 }

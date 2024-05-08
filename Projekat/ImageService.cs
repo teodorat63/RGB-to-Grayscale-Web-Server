@@ -20,48 +20,6 @@ namespace Projekat
             cache = MemoryCache.Default;
         }
 
-
-        public async Task ServeImageAsync(string request, NetworkStream stream)
-        {
-            try
-            {
-                string[] parts = request.Split(' ');
-                string filename = parts[1].Substring(1); // Remove the leading slash
-                byte[] imageData = System.IO.File.ReadAllBytes(filename);
-
-                // Load the image
-                using (MemoryStream ms = new MemoryStream(imageData))
-                {
-                    Image image = Image.FromStream(ms);
-
-                    // Convert the image to grayscale
-                    Bitmap grayscaleImage = ConvertToGrayscale(image);
-
-                    // Save the grayscale image to a memory stream
-                    using (MemoryStream outputMs = new MemoryStream())
-                    {
-                        grayscaleImage.Save(outputMs, ImageFormat.Jpeg);
-                        byte[] outputData = outputMs.ToArray();
-
-                        // Send the grayscale image response
-                        HttpResponseHandler responseHandler = new HttpResponseHandler();
-                        responseHandler.SendImageResponse(outputData, stream);
-                    }
-
-                    // Dispose resources
-                    image.Dispose();
-                    grayscaleImage.Dispose();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error serving image: {ex.Message}");
-                string notFoundResponse = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n404 Not Found";
-                byte[] notFoundData = Encoding.UTF8.GetBytes(notFoundResponse);
-                await stream.WriteAsync(notFoundData, 0, notFoundData.Length);
-            }
-        }
-
         public void ServeImage(string request, NetworkStream stream)
         {
             try

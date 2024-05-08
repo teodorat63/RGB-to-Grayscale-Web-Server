@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -7,7 +6,6 @@ using System.Net.Sockets;
 using System.Runtime.Caching;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Projekat
 {

@@ -17,7 +17,7 @@ namespace Projekat
         {
             StringBuilder responseBuilder = new StringBuilder();
             responseBuilder.AppendLine("HTTP/1.1 200 OK");
-            responseBuilder.AppendLine("Content-Type: image/jpeg"); // Change content type according to your image type
+            responseBuilder.AppendLine("Content-Type: image/jpeg"); 
             responseBuilder.AppendLine($"Content-Length: {imageData.Length}");
             responseBuilder.AppendLine();
             byte[] responseHeader = Encoding.UTF8.GetBytes(responseBuilder.ToString());

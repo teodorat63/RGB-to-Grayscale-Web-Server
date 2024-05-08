@@ -19,11 +19,13 @@ namespace Projekat
         public int myNumber { get; set; }
         public string request { get; set; }
 
-        public string successful { get; set; }
+        public string details { get; set; }
+
+        public TimeSpan time { get; set; }
 
         public override string ToString() {
 
-            string response = myNumber + ". Request\n " + request  + successful  + "\n";
+            string response = myNumber + ". Request\n " + request  + details  + "\n" + "Time: " +time + "\n";
             return response;
         }
 

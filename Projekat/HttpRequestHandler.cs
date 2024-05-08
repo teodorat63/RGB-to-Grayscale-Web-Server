@@ -21,16 +21,24 @@ namespace Projekat
 
         }
 
-        public bool IsValidImageRequest(string request)
+        public bool isIndexPageRequest (string request)
         {
             string[] parts = request.Split(' ');
             string filename = parts[1].Substring(1); // Remove the leading slash
 
             if (filename == "")
             {
-              throw new ArgumentNullException();
-  
+                return true;
             }
+            return false;
+
+
+        }
+
+        public bool IsValidImageRequest(string request)
+        {
+            string[] parts = request.Split(' ');
+            string filename = parts[1].Substring(1); // Remove the leading slash
 
             if (!File.Exists(filename))
             {
@@ -47,7 +55,6 @@ namespace Projekat
             else
             {
                 throw new ArgumentException("File " + filename + " is not a valid image file");
-
 
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -45,38 +46,52 @@ namespace Projekat
                     HttpResponseHandler responseHandler = new HttpResponseHandler();
                     ImageService imageService = new ImageService();
                     RequestInfo newRequest = new RequestInfo();
+                    Stopwatch stopwatch = new Stopwatch();
+
 
 
                     try
                     {
+                        stopwatch.Start();
                         string request = requestHandler.ReadRequest(stream);
 
                         newRequest.request= request;
                         receivedRequests.Add(newRequest);
 
-                        if (requestHandler.IsValidImageRequest(request))
+                        if(requestHandler.isIndexPageRequest(request))
+                        {
+                            responseHandler.SendResponse("Dobrodosli na server!", stream);
+                            newRequest.details = "Successfully accessed main page";
+                            stopwatch.Stop();
+                            newRequest.time = stopwatch.Elapsed;
+
+                        }
+                        else if (requestHandler.IsValidImageRequest(request))
                         {
                             imageService.ServeImage(request, stream);
-                            newRequest.successful = "Image successfully served";
-                        }
+                            newRequest.details = "Image successfully served";
+                            stopwatch.Stop();
+                            newRequest.time = stopwatch.Elapsed;
 
-                    }
-                    catch (ArgumentNullException)
-                    {
-                        responseHandler.SendResponse("Dobrodosli na server!", stream);
-                        newRequest.successful = "Successfully accessed main page";
+                        }
 
                     }
                     catch (ArgumentException ex)
                     {
                         responseHandler.SendResponse(ex.Message, stream);
-                        newRequest.successful = "Unsuccessful" + ex.Message;
+                        newRequest.details = "Unsuccessful " + ex.Message;
+                        stopwatch.Stop();
+                        newRequest.time = stopwatch.Elapsed;
+
 
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"{ex.Message}");
-                        newRequest.successful = "Unsuccessful" + ex.Message;
+                        newRequest.details = "Unsuccessful " + ex.Message;
+                        stopwatch.Stop();
+                        newRequest.time = stopwatch.Elapsed;
+
 
                     }
                     finally

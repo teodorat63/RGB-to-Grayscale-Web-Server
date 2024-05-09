@@ -17,7 +17,7 @@ namespace Projekat
         {
             cache = MemoryCache.Default;
         }
-
+        //
         public void ServeImage(string request, NetworkStream stream)
         {
             try

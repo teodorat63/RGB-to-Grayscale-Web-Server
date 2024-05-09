@@ -1,33 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
-namespace Projekat
+public class RequestInfo
 {
-    internal class RequestInfo
+    static private int numberOfRequests = 0;
+
+    public RequestInfo()
     {
-        static private int numberOfRequests = 0;
+        numberOfRequests++;
+        myNumber = numberOfRequests;
+        stopwatch = new Stopwatch();
+    }
 
-        public RequestInfo() {
-            numberOfRequests++;
-            myNumber = numberOfRequests;
+    public int myNumber { get; set; }
 
+    private string _request;
+    public string request
+    {
+        get { return _request; }
+        set
+        {
+            _request = value;
+            if (stopwatch.IsRunning == false)
+                stopwatch.Start();
         }
+    }
 
-        public int myNumber { get; set; }
-        public string request { get; set; }
-
-        public string details { get; set; }
-
-        public TimeSpan time { get; set; }
-
-        public override string ToString() {
-
-            string response = myNumber + ". Request\n " + request  + details  + "\n" + "Time: " +time + "\n";
-            return response;
+    private string _details;
+    public string details
+    {
+        get { return _details; }
+        set
+        {
+            _details = value;
+            if (stopwatch.IsRunning)
+            {
+                stopwatch.Stop();
+                time = stopwatch.Elapsed;
+            }
         }
+    }
 
+    public TimeSpan time { get; private set; }
+    private Stopwatch stopwatch;
+
+    public override string ToString()
+    {
+        string response = myNumber + ". Request\n " + request + " " + details + "\n" + "Time: " + time + "\n";
+        return response;
     }
 }

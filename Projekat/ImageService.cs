@@ -23,7 +23,7 @@ namespace Projekat
             try
             {
                 string[] parts = request.Split(' ');
-                string filename = parts[1].Substring(1); // Remove the leading slash
+                string filename = parts[1].Substring(1); 
 
                 // Check if the grayscale image is cached
                 byte[] cachedGrayscaleImage = cache.Get(filename) as byte[];
@@ -96,7 +96,6 @@ namespace Projekat
                 threads[i].Start();
             }
 
-            // Wait for all threads to complete
             foreach (Thread thread in threads)
             {
                 thread.Join();

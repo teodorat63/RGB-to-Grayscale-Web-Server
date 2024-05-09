@@ -11,6 +11,8 @@ namespace Projekat
     {
         private TcpListener tcpListener;
         private List<RequestInfo> receivedRequests;
+        private readonly object requestLock = new object();
+
 
         public TcpServer(IPAddress ipAddress, int port)
         {
@@ -48,30 +50,26 @@ namespace Projekat
                     RequestInfo newRequest = new RequestInfo();
                     Stopwatch stopwatch = new Stopwatch();
 
-
-
                     try
                     {
-                        stopwatch.Start();
                         string request = requestHandler.ReadRequest(stream);
 
-                        newRequest.request= request;
-                        receivedRequests.Add(newRequest);
+                        lock (requestLock)
+                        {
+                            newRequest.request = request;
+                            receivedRequests.Add(newRequest);
+                        }
 
-                        if(requestHandler.isIndexPageRequest(request))
+                        if (requestHandler.isIndexPageRequest(request))
                         {
                             responseHandler.SendResponse("Dobrodosli na server!", stream);
                             newRequest.details = "Successfully accessed main page";
-                            stopwatch.Stop();
-                            newRequest.time = stopwatch.Elapsed;
 
                         }
                         else if (requestHandler.IsValidImageRequest(request))
                         {
                             imageService.ServeImage(request, stream);
                             newRequest.details = "Image successfully served";
-                            stopwatch.Stop();
-                            newRequest.time = stopwatch.Elapsed;
 
                         }
 
@@ -80,8 +78,6 @@ namespace Projekat
                     {
                         responseHandler.SendResponse(ex.Message, stream);
                         newRequest.details = "Unsuccessful " + ex.Message;
-                        stopwatch.Stop();
-                        newRequest.time = stopwatch.Elapsed;
 
 
                     }
@@ -89,14 +85,12 @@ namespace Projekat
                     {
                         Console.WriteLine($"{ex.Message}");
                         newRequest.details = "Unsuccessful " + ex.Message;
-                        stopwatch.Stop();
-                        newRequest.time = stopwatch.Elapsed;
 
 
                     }
                     finally
                     {
-                        foreach (var request in receivedRequests) { Console.WriteLine(request.ToString()); }
+                         Console.WriteLine(newRequest.ToString()); 
                     }
                 }
             }
